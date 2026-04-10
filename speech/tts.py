@@ -108,15 +108,15 @@ class TTSEngine:
     # ── Public API ─────────────────────────────────────────────────────────
 
     def speak(self, text: str):
-        """
-        Speak a string of text. Synthesizes immediately and queues
-        for playback. Returns instantly — playback happens in background.
-        This is what the streaming pipeline calls sentence by sentence.
-        """
-        if not text.strip():
+        cleaned = text.strip()
+        if not cleaned:
             return
-        print(f"[TTS] Speaking: {text[:60]}{'...' if len(text) > 60 else ''}")
-        wav_path = self._synthesize(text)
+        if len(cleaned) < 4:
+            return
+        if all(c in '.,!?;:()-–—"\'' for c in cleaned):
+            return
+        # Uncomment to debug TTS: print(f"[TTS] Speaking: {cleaned[:60]}")
+        wav_path = self._synthesize(cleaned)
         if wav_path:
             self._playback_queue.put(wav_path)
 
